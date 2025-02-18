@@ -51,4 +51,18 @@ public class UserService {
         // Se o usuario existir, ele é removido do banco de dados.
         userRepository.deleteById(id);
     }
+
+    public User getUserById(String id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+    }
+
+    public boolean deleteUserById(String id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }
+
