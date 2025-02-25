@@ -30,3 +30,10 @@ public class TaskService {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found")); //se nao existir mostra exceção
     }
+
+    @Transactional // Garante que a operação será executada em uma transação
+    public Task createTask(Task task) {
+        task.setCreatedAt(LocalDateTime.now()); // Define a data de criação como o momento atual
+        task.setUpdatedAt(LocalDateTime.now()); // Define a data de atualização também como o momento atual
+        return taskRepository.save(task); // Salva a tarefa no banco de dados
+    }
