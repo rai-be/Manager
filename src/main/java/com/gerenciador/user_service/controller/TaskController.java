@@ -2,6 +2,7 @@ package com.gerenciador.user_service.controller;
 
 
 import com.gerenciador.user_service.model.Task;
+import com.gerenciador.user_service.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
