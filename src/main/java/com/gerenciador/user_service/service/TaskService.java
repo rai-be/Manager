@@ -57,3 +57,13 @@ public class TaskService {
 
         return taskRepository.save(task); // Salva e retorna a tarefa atualizada.
     }
+
+    //deletar tarefa no bd
+    @Transactional
+    public void deleteTask(Long id) {
+        if (!taskRepository.existsById(id)) {
+            throw new RuntimeException("Task not found"); // Lança erro se a tarefa não existir.
+        }
+        taskRepository.deleteById(id); // Remove a tarefa do banco de dados.
+    }
+}
