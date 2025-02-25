@@ -1,4 +1,4 @@
-package com.gerenciador.user_service.dto;
+package com.gerenciador.user_service.taskService.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,8 +1,8 @@
-package com.gerenciador.user_service.controller;
+package com.gerenciador.user_service.taskService.controllers;
 
 
-import com.gerenciador.user_service.model.Task;
-import com.gerenciador.user_service.service.TaskService;
+import com.gerenciador.user_service.taskService.model.Task;
+import com.gerenciador.user_service.taskService.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class TaskController {
 
     //retorna lista de tarefas concluidas
     @GetMapping
-    public ResponseEntity<List<com.gerenciador.user_service.model.Task>> getAllTasks() {
+    public ResponseEntity<List<Task>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
