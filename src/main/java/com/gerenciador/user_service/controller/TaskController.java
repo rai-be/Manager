@@ -16,13 +16,20 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    //injeção de dependencia do service
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
 
+    //retorna lista de tarefas concluidas
     @GetMapping
     public ResponseEntity<List<com.gerenciador.user_service.model.Task>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
+    //retorna tarefa por id
+    @GetMapping("/{id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        return ResponseEntity.ok(taskService.getTaskById(id));
+    }
 
