@@ -37,3 +37,23 @@ public class TaskService {
         task.setUpdatedAt(LocalDateTime.now()); // Define a data de atualização também como o momento atual
         return taskRepository.save(task); // Salva a tarefa no banco de dados
     }
+
+    @Transactional
+    public Task updateTask(Long id, Task taskDetails) {
+        Task task = getTaskById(id); // Busca a tarefa pelo ID, se não existir, lança exceção.
+
+        // Atualiza os campos da tarefa com os novos valores recebidos.
+        task.setTitle(taskDetails.getTitle());
+        task.setDescription(taskDetails.getDescription());
+        task.setCategory(taskDetails.getCategory());
+        task.setPriority(taskDetails.getPriority());
+        task.setCompleted(taskDetails.isCompleted());
+        task.setUpdatedAt(LocalDateTime.now()); // Atualiza a data da última modificação.
+
+        // Se a tarefa foi alterada de "não concluída" para "concluída", envia uma notificação.
+        if (!task.isCompleted() && taskDetails.isCompleted()) {
+            notificationClient.sendNotification("Task completed: " + task.getTitle());
+        }
+
+        return taskRepository.save(task); // Salva e retorna a tarefa atualizada.
+    }
