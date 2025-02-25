@@ -38,3 +38,9 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         return ResponseEntity.ok(taskService.createTask(task));
     }
+
+    //atuaizar e retornar tarefa
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task task) {
+        return ResponseEntity.ok(taskService.updateTask(id, task));
+    }
