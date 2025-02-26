@@ -1,5 +1,6 @@
 package com.gerenciador.user_service.taskService.model;
 
+import com.gerenciador.user_service.taskService.enums.TaskPriority;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -11,7 +12,11 @@ public class Task {
     private String title;
     private String description;
     private String category;
-    private String priority;
+
+    //troca para usar enum
+    @Enumerated(EnumType.STRING)
+    private TaskPriority priority;
+
     private boolean completed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
