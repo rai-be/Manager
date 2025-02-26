@@ -1,5 +1,6 @@
 package taskService.service;
 
+import taskService.history.TaskHistory;
 import taskService.model.Task;
 import taskService.notificationClient.NotificationClient;
 import taskService.repository.TaskRepository;
@@ -43,6 +44,8 @@ public class TaskService {
     public Task updateTask(Long id, Task taskDetails) {
         Task task = getTaskById(id); // Busca a tarefa pelo ID, se não existir, lança exceção.
 
+
+
         // Atualiza os campos da tarefa com os novos valores recebidos.
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
@@ -67,4 +70,30 @@ public class TaskService {
         }
         taskRepository.deleteById(id); // Remove a tarefa do banco de dados.
     }
+
+    @Transactional
+    public Task updateTask(Long id, Task taskDetails) {
+        Task task = getTaskById(id);
+
+        // Criar histórico antes de modificar
+        saveTaskHistory(task, "title", task.getTitle(), taskDetails.getTitle());
+        saveTaskHistory(task, "description", task.getDescription(), taskDetails.getDescription());
+
+        task.setTitle(taskDetails.getTitle());
+        task.setDescription(taskDetails.getDescription());
+        task.setUpdatedAt(LocalDateTime.now());
+
+        return taskRepository.save(task);
+    }
+
+    private void saveTaskHistory(Task task, String field, String oldValue, String newValue) {
+        if (!oldValue.equals(newValue)) {
+            TaskHistory history = new TaskHistory();
+            history.setTaskId(task.getId());
+            history.setFieldName(field);
+            history.setOldValue(oldValue);
+            history.setNewValue(newValue);
+            history.setModifiedAt(LocalDateTime.now());
+            taskHistoryRepository.save(history);
+        }
 }
