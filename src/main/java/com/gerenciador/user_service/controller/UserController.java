@@ -6,9 +6,11 @@ import com.gerenciador.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -20,6 +22,22 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -64,5 +82,35 @@ public class UserController {
         }
         return errors;
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        boolean isDeleted = userService.deleteUserById(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        List<String> validationErrors = validateUserDTO(userDTO);
+
+        if (!validationErrors.isEmpty()) {
+            return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
+        }
+
+        User existingUser = userService.getUserById(id);
+        if (existingUser == null) {
+            return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+        }
+        existingUser.setUsername(userDTO.getUsername());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setPassword(userDTO.getPassword());
+        User updatedUser = userService.saveUser(existingUser);
+        return ResponseEntity.ok(updatedUser);
+
+    }
+
 }
-//mantermos comentarios enquanto estivermos realizando para sabermos as mudanças
