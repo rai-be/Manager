@@ -16,3 +16,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+
+  flyway:
+    baseline-on-migrate: true  # Aqui é onde deve estar a configuração Flyway
+
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka/
+      instance:
+        prefer-ip-address: true
+
+debug: true
