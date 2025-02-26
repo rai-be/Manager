@@ -1,8 +1,8 @@
-package com.gerenciador.user_service.taskService.notificationClient;
+package taskService.notificationClient;
 
-import com.gerenciador.user_service.taskService.enums.TaskPriority;
-import com.gerenciador.user_service.taskService.model.Task;
-import com.gerenciador.user_service.taskService.repository.TaskRepository;
+import taskService.enums.TaskPriority;
+import taskService.model.Task;
+import taskService.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

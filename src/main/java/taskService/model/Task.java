@@ -1,6 +1,6 @@
-package com.gerenciador.user_service.taskService.model;
+package taskService.model;
 
-import com.gerenciador.user_service.taskService.enums.TaskPriority;
+import taskService.enums.TaskPriority;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 

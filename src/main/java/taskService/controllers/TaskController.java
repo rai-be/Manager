@@ -1,8 +1,8 @@
-package com.gerenciador.user_service.taskService.controllers;
+package taskService.controllers;
 
 
-import com.gerenciador.user_service.taskService.model.Task;
-import com.gerenciador.user_service.taskService.service.TaskService;
+import taskService.model.Task;
+import taskService.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

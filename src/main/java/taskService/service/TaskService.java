@@ -1,8 +1,8 @@
-package com.gerenciador.user_service.taskService.service;
+package taskService.service;
 
-import com.gerenciador.user_service.taskService.model.Task;
-import com.gerenciador.user_service.taskService.notificationClient.NotificationClient;
-import com.gerenciador.user_service.taskService.repository.TaskRepository;
+import taskService.model.Task;
+import taskService.notificationClient.NotificationClient;
+import taskService.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
