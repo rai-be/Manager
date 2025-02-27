@@ -4,7 +4,7 @@ import com.gerenciador.user_service.model.User;
 import com.gerenciador.user_service.respository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.List;  //só adicionei os metodos que ficaram de fora
 import java.util.Optional;
 
 @Service
@@ -50,5 +50,18 @@ public class UserService {
 
         // Se o usuario existir, ele é removido do banco de dados.
         userRepository.deleteById(id);
+    }
+
+    public User getUserById(String id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+    }
+
+    public boolean deleteUserById(String id) {
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
