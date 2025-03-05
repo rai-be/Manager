@@ -1,6 +1,6 @@
 package taskService.service;
 
-import taskService.history.TaskHistory;
+import taskService.enums.TaskHistory;
 import taskService.model.Task;
 import taskService.notificationClient.NotificationClient;
 import taskService.repository.TaskRepository;
@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class TaskService {
+public class
+TaskService {
 
     private final TaskRepository taskRepository;
     private final NotificationClient notificationClient;

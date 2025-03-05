@@ -1,4 +1,4 @@
-package taskService.history;
+package taskService.enums;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,15 +8,14 @@ import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-public class TaskHistory {
+public class TaskCommet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long taskId;
-    private String fieldName;
-    private String oldValue;
-    private String newValue;
-    private LocalDateTime modifiedAt;
+    private String comment;
+    private String author;
+    private LocalDateTime createdAt;
 }

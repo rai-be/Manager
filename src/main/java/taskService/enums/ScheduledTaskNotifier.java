@@ -1,7 +1,7 @@
-package taskService.notificationClient;
+package taskService.enums;
 
-import taskService.enums.TaskPriority;
 import taskService.model.Task;
+import taskService.notificationClient.NotificationClient;
 import taskService.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
