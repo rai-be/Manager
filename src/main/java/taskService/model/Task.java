@@ -12,9 +12,11 @@ public class Task {
     private Long id;
     private String title;
     private String description;
-    private String category;
 
     //troca para usar enum
+    @Enumerated(EnumType.STRING)
+    private TaskCategory category;
+
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
 
@@ -94,8 +96,5 @@ public class Task {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
-    @Enumerated(EnumType.STRING)
-    private TaskCategory category;
 
 }
