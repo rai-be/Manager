@@ -1,5 +1,6 @@
 package taskService.model;
 
+import taskService.enums.TaskCategory;
 import taskService.enums.TaskPriority;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -93,4 +94,8 @@ public class Task {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Enumerated(EnumType.STRING)
+    private TaskCategory category;
+
 }
