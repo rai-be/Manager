@@ -13,7 +13,7 @@ public class Task {
     private String title;
     private String description;
 
-    //troca para usar enum
+
     @Enumerated(EnumType.STRING)
     private TaskCategory category;
 
@@ -24,15 +24,15 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Construtor padrão
+
     public Task() {}
 
-    // Construtor com id
+
     public Task(Long id) {
         this.id = id;
     }
 
-    // Getters e setters manualmente
+
     public Long getId() {
         return id;
     }
@@ -57,19 +57,19 @@ public class Task {
         this.description = description;
     }
 
-    public String getCategory() {
+    public TaskCategory getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(TaskCategory category) {
         this.category = category;
     }
 
-    public String getPriority() {
+    public TaskPriority getPriority() {
         return priority;
     }
 
-    public void setPriority(String priority) {
+    public void setPriority(TaskPriority priority) {
         this.priority = priority;
     }
 
@@ -96,5 +96,4 @@ public class Task {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 }

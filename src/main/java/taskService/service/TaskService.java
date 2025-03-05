@@ -1,9 +1,13 @@
 package taskService.service;
 
-import taskService.enums.TaskHistory;
+import org.springframework.beans.factory.annotation.Autowired;
+import taskService.model.TaskHistory;
 import taskService.model.Task;
+import taskService.model.TaskComment;
+import taskService.repository.TaskHistoryRepository;
 import taskService.notificationClient.NotificationClient;
 import taskService.repository.TaskRepository;
+import taskService.repository.TaskCommentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +19,19 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final NotificationClient notificationClient;
+    private final TaskHistoryRepository taskHistoryRepository;
+    private final TaskCommentRepository taskCommentRepository;
 
     // Construtor manual para injeção de dependências
-    public TaskService(TaskRepository taskRepository, NotificationClient notificationClient) {
+    @Autowired
+    public TaskService(TaskRepository taskRepository,
+                       NotificationClient notificationClient,
+                       TaskHistoryRepository taskHistoryRepository, TaskCommentRepository taskCommentRepository) {
         this.taskRepository = taskRepository;
         this.notificationClient = notificationClient;
+        this.taskHistoryRepository = taskHistoryRepository;
+        this.taskCommentRepository = taskCommentRepository;
     }
-
     // Lista de tarefas
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
@@ -81,7 +91,28 @@ public class TaskService {
             history.setOldValue(oldValue);
             history.setNewValue(newValue);
             history.setModifiedAt(LocalDateTime.now());
+
             taskHistoryRepository.save(history);
+        }
+    }
+
+    public static class TaskCommentService {
+        private final TaskCommentRepository taskCommentRepository;
+
+        // Construtor para injeção de dependência
+        @Autowired
+        public TaskCommentService(TaskCommentRepository taskCommentRepository) {
+            this.taskCommentRepository = taskCommentRepository;
+        }
+
+        public TaskComment addComment(Long taskId, String comment, String author) {
+            TaskComment taskComment = new TaskComment();
+            taskComment.setTaskId(taskId);
+            taskComment.setComment(comment);
+            taskComment.setAuthor(author);
+            taskComment.setCreatedAt(LocalDateTime.now());
+
+            return taskCommentRepository.save(taskComment);
         }
     }
 }
