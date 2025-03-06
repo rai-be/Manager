@@ -1,4 +1,4 @@
-package com.gerenciador.user_service.notificationClient;
+package taskService.notificationClient;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
