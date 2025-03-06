@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TaskService {
@@ -32,6 +33,7 @@ public class TaskService {
         this.taskHistoryRepository = taskHistoryRepository;
         this.taskCommentRepository = taskCommentRepository;
     }
+
     // Lista de tarefas
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
@@ -40,11 +42,14 @@ public class TaskService {
     // Busca por ID
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
     }
 
     @Transactional
     public Task createTask(Task task) {
+        if (task == null) {
+            throw new IllegalArgumentException("Task cannot be null");
+        }
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
         return taskRepository.save(task);
@@ -52,6 +57,10 @@ public class TaskService {
 
     @Transactional
     public Task updateTask(Long id, Task taskDetails) {
+        if (taskDetails == null) {
+            throw new IllegalArgumentException("Task details cannot be null");
+        }
+
         Task task = getTaskById(id);
 
         // Criar histórico antes de modificar os valores
@@ -77,14 +86,14 @@ public class TaskService {
     @Transactional
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new RuntimeException("Task not found");
+            throw new TaskNotFoundException("Task not found with id: " + id);
         }
         taskRepository.deleteById(id);
     }
 
     // Salvar histórico de alterações
     private void saveTaskHistory(Task task, String field, String oldValue, String newValue) {
-        if (oldValue != null && !oldValue.equals(newValue)) {
+        if (oldValue != null && !Objects.equals(oldValue, newValue)) {
             TaskHistory history = new TaskHistory();
             history.setTaskId(task.getId());
             history.setFieldName(field);
@@ -106,6 +115,13 @@ public class TaskService {
         }
 
         public TaskComment addComment(Long taskId, String comment, String author) {
+            if (comment == null || comment.isBlank()) {
+                throw new IllegalArgumentException("Comment cannot be null or blank");
+            }
+            if (author == null || author.isBlank()) {
+                throw new IllegalArgumentException("Author cannot be null or blank");
+            }
+
             TaskComment taskComment = new TaskComment();
             taskComment.setTaskId(taskId);
             taskComment.setComment(comment);
@@ -113,6 +129,13 @@ public class TaskService {
             taskComment.setCreatedAt(LocalDateTime.now());
 
             return taskCommentRepository.save(taskComment);
+        }
+    }
+
+    // Exceção personalizada para tarefas não encontradas
+    public static class TaskNotFoundException extends RuntimeException {
+        public TaskNotFoundException(String message) {
+            super(message);
         }
     }
 }
