@@ -1,4 +1,4 @@
-package taskService.model;
+package com.gerenciador.user_service.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

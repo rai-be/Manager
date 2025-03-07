@@ -1,4 +1,4 @@
-package taskService.enums;
+package com.gerenciador.user_service.enums;
 
 public enum TaskPriority {
     LOW,       // Baixa prioridade

@@ -1,9 +1,16 @@
 package com.gerenciador.user_service.config;
 
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@EnableFeignClients(basePackages = "com.gerenciador.user_service.service")
 public class AppConfig {
+
+    @Bean
+    @Qualifier("notificationRestTemplate")
+    public RestTemplate notificationRestTemplate() {
+        return new RestTemplate();
+    }
 }
