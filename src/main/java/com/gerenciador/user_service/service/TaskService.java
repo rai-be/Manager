@@ -1,15 +1,15 @@
-package taskService.service;
+package com.gerenciador.user_service.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import taskService.model.TaskHistory;
-import taskService.model.Task;
-import taskService.model.TaskComment;
-import taskService.repository.TaskHistoryRepository;
-import taskService.notificationClient.NotificationClient;
-import taskService.repository.TaskRepository;
-import taskService.repository.TaskCommentRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
+import com.gerenciador.user_service.model.TaskHistory;
+import com.gerenciador.user_service.model.Task;
+import com.gerenciador.user_service.respository.TaskHistoryRepository;
+import com.gerenciador.user_service.notificationClient.NotificationClient;
+import com.gerenciador.user_service.respository.TaskRepository;
+import com.gerenciador.user_service.respository.TaskCommentRepository;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,16 +22,26 @@ public class TaskService {
     private final NotificationClient notificationClient;
     private final TaskHistoryRepository taskHistoryRepository;
     private final TaskCommentRepository taskCommentRepository;
+    private final RestTemplate restTemplate;
 
-    // Construtor manual para injeção de dependências
     @Autowired
-    public TaskService(TaskRepository taskRepository,
-                       NotificationClient notificationClient,
-                       TaskHistoryRepository taskHistoryRepository, TaskCommentRepository taskCommentRepository) {
+    public TaskService(
+            TaskRepository taskRepository,
+            NotificationClient notificationClient,
+            TaskHistoryRepository taskHistoryRepository,
+            TaskCommentRepository taskCommentRepository,
+            RestTemplate restTemplate) {
         this.taskRepository = taskRepository;
         this.notificationClient = notificationClient;
         this.taskHistoryRepository = taskHistoryRepository;
         this.taskCommentRepository = taskCommentRepository;
+        this.restTemplate = restTemplate;
+    }
+
+    // Chamada ao UserService para buscar informações sobre o usuário
+    public String getUserInfoFromUserService(Long userId) {
+        String userServiceUrl = "http://localhost:8085/user-service/user/" + userId;
+        return restTemplate.getForObject(userServiceUrl, String.class);  // Chama o UserService
     }
 
     // Lista de tarefas
@@ -63,7 +73,6 @@ public class TaskService {
 
         Task task = getTaskById(id);
 
-        // Criar histórico antes de modificar os valores
         saveTaskHistory(task, "title", task.getTitle(), taskDetails.getTitle());
         saveTaskHistory(task, "description", task.getDescription(), taskDetails.getDescription());
 
@@ -74,7 +83,6 @@ public class TaskService {
         task.setCompleted(taskDetails.isCompleted());
         task.setUpdatedAt(LocalDateTime.now());
 
-        // Se a tarefa foi concluída, enviar notificação
         if (!task.isCompleted() && taskDetails.isCompleted()) {
             notificationClient.sendNotification("Task completed: " + task.getTitle());
         }
@@ -82,7 +90,6 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // Deletar tarefa do banco
     @Transactional
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
@@ -91,7 +98,6 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-    // Salvar histórico de alterações
     private void saveTaskHistory(Task task, String field, String oldValue, String newValue) {
         if (oldValue != null && !Objects.equals(oldValue, newValue)) {
             TaskHistory history = new TaskHistory();
@@ -105,37 +111,13 @@ public class TaskService {
         }
     }
 
-    public static class TaskCommentService {
-        private final TaskCommentRepository taskCommentRepository;
-
-        // Construtor para injeção de dependência
-        @Autowired
-        public TaskCommentService(TaskCommentRepository taskCommentRepository) {
-            this.taskCommentRepository = taskCommentRepository;
-        }
-
-        public TaskComment addComment(Long taskId, String comment, String author) {
-            if (comment == null || comment.isBlank()) {
-                throw new IllegalArgumentException("Comment cannot be null or blank");
-            }
-            if (author == null || author.isBlank()) {
-                throw new IllegalArgumentException("Author cannot be null or blank");
-            }
-
-            TaskComment taskComment = new TaskComment();
-            taskComment.setTaskId(taskId);
-            taskComment.setComment(comment);
-            taskComment.setAuthor(author);
-            taskComment.setCreatedAt(LocalDateTime.now());
-
-            return taskCommentRepository.save(taskComment);
-        }
-    }
-
-    // Exceção personalizada para tarefas não encontradas
     public static class TaskNotFoundException extends RuntimeException {
         public TaskNotFoundException(String message) {
             super(message);
+        }
+
+        public TaskNotFoundException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }

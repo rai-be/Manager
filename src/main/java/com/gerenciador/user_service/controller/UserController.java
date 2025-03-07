@@ -22,32 +22,49 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<User>> getUserByUsername(@RequestParam(required = false) String username) {
+        if (username != null && !username.trim().isEmpty()) {
+            User user = userService.getUserByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("Usuário com o username " + username + " não encontrado"));
+            return ResponseEntity.ok(List.of(user));
+        }
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(user);
+    }
+
     @PostMapping
     public ResponseEntity<Object> createUser(@RequestBody UserDTO userDTO) {
-        // Chama o método de validação para verificar se os dados do dto estão corretos.
         List<String> validationErrors = validateUserDTO(userDTO);
 
         if (!validationErrors.isEmpty()) {
             return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
         }
 
-        // Converte o DTO para uma entidade User.
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(userDTO.getPassword());
 
+        if (userService.existsByUsername(userDTO.getUsername())) {
+            return new ResponseEntity<>("Usuário com o username " + userDTO.getUsername() + " já existe!", HttpStatus.BAD_REQUEST);
+        }
+
         User savedUser = userService.saveUser(user);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
-    // Método privado para validar a dto antes de tentar criar um usuario.
     private List<String> validateUserDTO(UserDTO userDTO) {
-        // Lista para armazenar possiveis erros de validação.
         List<String> errors = new ArrayList<>();
 
         if (userDTO.getUsername() == null || userDTO.getUsername().trim().isEmpty()) {
-            errors.add("O nome de usuario é obrigatório");
+            errors.add("O nome de usuário é obrigatório");
         }
 
         if (userDTO.getEmail() == null || userDTO.getEmail().trim().isEmpty()) {
@@ -55,14 +72,47 @@ public class UserController {
         } else {
             String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
             if (!userDTO.getEmail().matches(emailRegex)) {
-                errors.add("O email deve ser valido");
+                errors.add("O email deve ser válido");
             }
         }
 
         if (userDTO.getPassword() == null || userDTO.getPassword().trim().isEmpty()) {
-            errors.add("A senha é obrigatório");
+            errors.add("A senha é obrigatória");
         }
         return errors;
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        boolean isDeleted = userService.deleteUserById(id);
+        if (isDeleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateUser(@PathVariable String id, @RequestBody UserDTO userDTO) {
+        List<String> validationErrors = validateUserDTO(userDTO);
+
+        if (!validationErrors.isEmpty()) {
+            return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
+        }
+
+        User existingUser = userService.getUserById(id);
+        if (existingUser == null) {
+            return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        if (userService.existsByUsername(userDTO.getUsername()) && !userDTO.getUsername().equals(existingUser.getUsername())) {
+            return new ResponseEntity<>("Usuário com o username " + userDTO.getUsername() + " já existe!", HttpStatus.BAD_REQUEST);
+        }
+
+        existingUser.setUsername(userDTO.getUsername());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setPassword(userDTO.getPassword());
+        User updatedUser = userService.saveUser(existingUser);
+        return ResponseEntity.ok(updatedUser);
+    }
 }
-//mantermos comentarios enquanto estivermos realizando para sabermos as mudanças

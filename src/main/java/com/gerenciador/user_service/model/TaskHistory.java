@@ -1,4 +1,4 @@
-package taskService.model;
+package com.gerenciador.user_service.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -17,7 +17,6 @@ public class TaskHistory {
     private String newValue;
     private LocalDateTime modifiedAt;
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

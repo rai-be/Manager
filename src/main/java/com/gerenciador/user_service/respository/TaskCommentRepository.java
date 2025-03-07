@@ -1,6 +1,6 @@
-package taskService.repository;
+package com.gerenciador.user_service.respository;
 
-import taskService.model.TaskComment;
+import com.gerenciador.user_service.model.TaskComment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
