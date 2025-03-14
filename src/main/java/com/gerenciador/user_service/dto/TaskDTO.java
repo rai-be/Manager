@@ -17,5 +17,11 @@ public class TaskDTO {
     private String priority;
     private LocalDateTime dueDate;
 
+    public String getTitle() {
+        return this.title != null ? this.title : "Título não fornecido";
+    }
 
+    public String getDescription() {
+        return this.description != null ? this.description : "Descrição não fornecida";
+    }
 }
