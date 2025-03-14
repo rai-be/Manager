@@ -20,7 +20,7 @@ public class ScheduledTaskNotifier {
         this.notificationClient = notificationClient;
     }
 
-    @Scheduled(fixedRate = 21600000)
+    @Scheduled(fixedRate = 30000) //A cada 30seg
     public void checkPendingTasks() {
         LocalDateTime now = LocalDateTime.now();
         List<Task> tasks = taskRepository.findByCompletedFalse();

@@ -1,5 +1,6 @@
 package com.gerenciador.user_service.service;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
@@ -12,7 +13,9 @@ import com.gerenciador.user_service.respository.TaskCommentRepository;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -23,6 +26,8 @@ public class TaskService {
     private final TaskHistoryRepository taskHistoryRepository;
     private final TaskCommentRepository taskCommentRepository;
     private final RestTemplate restTemplate;
+
+    private final Map<Long, String> userInfoCache = new HashMap<>();
 
     @Autowired
     public TaskService(
@@ -38,27 +43,30 @@ public class TaskService {
         this.restTemplate = restTemplate;
     }
 
-    // Chamada ao UserService para buscar informações sobre o usuário
     public String getUserInfoFromUserService(Long userId) {
-        String userServiceUrl = "http://localhost:8085/user-service/user/" + userId;
-        return restTemplate.getForObject(userServiceUrl, String.class);  // Chama o UserService
+        if (userInfoCache.containsKey(userId)) {
+            return userInfoCache.get(userId);
+        }
+
+        String userInfo = restTemplate.getForObject("http://localhost:8080/user-service/user/" + userId, String.class);
+        userInfoCache.put(userId, userInfo);
+
+        return userInfo;
     }
 
-    // Lista de tarefas
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
-    // Busca por ID
     public Task getTaskById(Long id) {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
     }
 
     @Transactional
-    public Task createTask(Task task) {
+    public Task createTask(Task task) throws BadRequestException {
         if (task == null) {
-            throw new IllegalArgumentException("Task cannot be null");
+            throw new BadRequestException("Task cannot be null");
         }
         task.setCreatedAt(LocalDateTime.now());
         task.setUpdatedAt(LocalDateTime.now());
@@ -66,9 +74,9 @@ public class TaskService {
     }
 
     @Transactional
-    public Task updateTask(Long id, Task taskDetails) {
+    public Task updateTask(Long id, Task taskDetails) throws BadRequestException {
         if (taskDetails == null) {
-            throw new IllegalArgumentException("Task details cannot be null");
+            throw new BadRequestException("Task details cannot be null");
         }
 
         Task task = getTaskById(id);
@@ -109,6 +117,22 @@ public class TaskService {
 
             taskHistoryRepository.save(history);
         }
+    }
+
+    public List<Task> getTasksByUser(String userId) {
+        try {
+            String userInfo = getUserInfoFromUserService(Long.valueOf(userId));
+            if (userInfo == null || userInfo.isEmpty()) {
+                throw new TaskNotFoundException("User not found with id: " + userId);
+            }
+            return taskRepository.findByUserId(userId);
+        } catch (Exception e) {
+            throw new TaskNotFoundException("Error while fetching user info or tasks for userId: " + userId, e);
+        }
+    }
+
+    public Task saveTask(Task task) {
+        return taskRepository.save(task);
     }
 
     public static class TaskNotFoundException extends RuntimeException {

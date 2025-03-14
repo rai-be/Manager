@@ -2,16 +2,25 @@ package com.gerenciador.user_service.dto;
 
 public class UserDTO {
 
+    private String id;
     private String username;
     private String email;
     private String password;
 
     public UserDTO() {}
 
-    public UserDTO(String username, String email, String password) {
+    public UserDTO(String id, String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String Id) {
+        this.username = id;
     }
 
     public String getUsername() {

@@ -1,7 +1,10 @@
 package com.gerenciador.user_service.controller;
 
+import com.gerenciador.user_service.dto.TaskDTO;
 import com.gerenciador.user_service.dto.UserDTO;
 import com.gerenciador.user_service.model.User;
+import com.gerenciador.user_service.model.Task;
+import com.gerenciador.user_service.service.TaskService;
 import com.gerenciador.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,10 +19,33 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final TaskService taskService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, TaskService taskService) {
         this.userService = userService;
+        this.taskService = taskService;
+    }
+
+    @PostMapping("/{userId}/tasks")
+    public ResponseEntity<Object> createTaskForUser(@PathVariable String userId, @RequestBody TaskDTO taskDTO) {
+        if (taskDTO.getTitle() == null || taskDTO.getTitle().trim().isEmpty()) {
+            return new ResponseEntity<>("O título da tarefa é obrigatório", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+        }
+
+        Task task = new Task();
+        task.setTitle(taskDTO.getTitle());
+        task.setDescription(taskDTO.getDescription());
+        task.setUser(user);
+
+        Task savedTask = taskService.saveTask(task);
+
+        return new ResponseEntity<>(savedTask, HttpStatus.CREATED);
     }
 
     @GetMapping
